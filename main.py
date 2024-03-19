@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-from tkcalendar import Calendar 
+# from tkcalendar import Calendar 
 import smtplib
 import sqlite3
 import time
@@ -90,7 +90,7 @@ class main:
         self.canvas8 = Canvas(self.fm3, bg='black', width=400, height=300)
         self.canvas8.place(x=475, y=40)
         
-        self.photo9=PhotoImage(file="library_management_files\visual_assets\afterlogin1.png")
+        self.photo9=PhotoImage(file=r'library_management_files\visual_assets\afterlogin1.png')
         self.canvas8.create_image(0,0,image=self.photo9,anchor=NW)
         
         self.bt1=Button(self.fm3,text='  Add Books',fg='#fff',bg='#581845',font=('candara',15,'bold'),width=170,height=0,bd=7,relief='flat',command=self.addbook,cursor='hand2',activebackground='black',activeforeground='#581845')
