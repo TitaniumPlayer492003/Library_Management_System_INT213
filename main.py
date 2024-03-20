@@ -7,9 +7,9 @@ import sqlite3
 import time
 from datetime import date
 
-db = sqlite3.connect(r"library_management_files\admin.db")
-dbstore = sqlite3.connect(r"library_management_files\StoreBooks.db")
-dbstudents = sqlite3.connect(r"library_management_files\StudentsData.db")
+db_admins = sqlite3.connect(r"library_management_files\admin.db")
+db_books = sqlite3.connect(r"library_management_files\StoreBooks.db")
+db_students = sqlite3.connect(r"library_management_files\StudentsData.db")
 
 root = Tk()
 root.title("Library Management System")
@@ -22,7 +22,7 @@ class main:
     def login(self):
         self.var1 = self.e1.get()
         self.var2 = self.e2.get()
-        cursor = db.cursor()
+        cursor = db_admins.cursor()
         cursor.execute(
             "SELECT * FROM UserLogin WHERE UserID='"
             + self.var1
@@ -30,7 +30,7 @@ class main:
             + self.var2
             + "'"
         )
-        db.commit()
+        db_admins.commit()
         self.ab = cursor.fetchone()
 
         if self.ab != None:
@@ -498,12 +498,12 @@ class main:
                     self.pri = self.ee5.get()
 
                     if self.id and self.ttl and self.aut and self.edi and self.pri:
-                        cursor = dbstore.cursor()
+                        cursor = db_books.cursor()
                         cursor.execute(
                             "INSERT INTO Books(BookID,Title,Author,Edition,Price) values(?,?,?,?,?)",
                             (self.id, self.ttl, self.aut, self.edi, self.pri),
                         )
-                        dbstore.commit()
+                        db_books.commit()
                         messagebox.showinfo(
                             "Success", "Book has been added to the library succesfully"
                         )
@@ -602,7 +602,7 @@ class main:
 
             def check(self):
                 self.b = self.em2.get()
-                cursor = dbstudents.cursor()
+                cursor = db_students.cursor()
                 cursor.execute("SELECT * FROM Students WHERE REG='" + self.b + "'")
                 self.var = cursor.fetchone()
 
@@ -745,7 +745,7 @@ class main:
 
             def data(self):
                 self.b = self.em2.get()
-                cursor = dbstudents.cursor()
+                cursor = db_students.cursor()
                 cursor.execute("SELECT * FROM Students WHERE REG='" + self.b + "'")
                 self.var = cursor.fetchone()
                 self.flag = 0
@@ -770,9 +770,9 @@ class main:
 
                 self.vva = self.e1.get()
 
-                cursor = dbstore.cursor()
+                cursor = db_books.cursor()
                 cursor.execute("SELECT * FROM Books WHERE BookID='" + self.vva + "'")
-                dbstore.commit()
+                db_books.commit()
                 self.value = cursor.fetchone()
                 if self.value != None:
                     if self.flag != 1:
@@ -973,7 +973,7 @@ class main:
                 self.datecon = self.cal.selection_get()
 
                 self.ac = self.e1.get()
-                cursor = dbstore.cursor()
+                cursor = db_books.cursor()
 
                 cursor.execute(
                     "UPDATE Books SET Issue='Issued', ID='"
@@ -982,10 +982,10 @@ class main:
                     + self.ac
                     + "'"
                 )
-                dbstore.commit()
+                db_books.commit()
 
                 if self.n <= 3:
-                    book = dbstudents.cursor()
+                    book = db_students.cursor()
                     self.erpid1 = self.em2.get()
                     book.execute(
                         "SELECT * FROM Students WHERE REG='" + self.erpid1 + "'"
@@ -999,9 +999,9 @@ class main:
                         + self.b
                         + "' "
                     )
-                    dbstudents.commit()
+                    db_students.commit()
 
-                comm = dbstudents.cursor()
+                comm = db_students.cursor()
                 comm.execute(
                     "UPDATE Students SET FromDate='"
                     + str(self.x)
@@ -1011,7 +1011,7 @@ class main:
                     + self.b
                     + "'"
                 )
-                dbstudents.commit()
+                db_students.commit()
 
                 messagebox.showinfo(
                     "Library Management System", "YOUR BOOK HAS BEEN ISSUED"
@@ -1019,27 +1019,27 @@ class main:
                 self.boot.destroy()
                 self.e1.delete(0, END)
 
-            def mail(self):
+            # def mail(self):
 
-                self.erpid = self.em2.get()
-                cursor = dbstudents.cursor()
-                cursor.execute("SELECT * FROM Students WHERE REG='" + self.erpid + "'")
-                self.var = cursor.fetchone()
-                sender = "libraryauthority@gmail.com"
-                reciever = self.var[5]
-                with open("pass.txt", "r") as file:
-                    password = file.read()
-                message = """FROM: LIBRARY DEPARTMENT
-                          TO : Library Issued Books Department
-                          Subject: Hello Student! Your book has been Issued"""
-                try:
-                    server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
-                    server.login(sender, password)
-                    server.sendmail(sender, reciever, message)
-                    print("ok")
-                    messagebox.showinfo("Library System", "Send mail Successfully !")
-                except Exception as e:
-                    pass
+            #     self.erpid = self.em2.get()
+            #     cursor = db_students.cursor()
+            #     cursor.execute("SELECT * FROM Students WHERE REG='" + self.erpid + "'")
+            #     self.var = cursor.fetchone()
+            #     sender = 'libraryauthority@gmail.com'
+            #     reciever = self.var[5]
+            #     with open("pass.txt", "r") as file:
+            #         password = file.read()
+            #     message = """FROM: LIBRARY DEPARTMENT
+            #               TO : Library Issued Books Department
+            #               Subject: Hello Student! Your book has been Issued"""
+            #     try:
+            #         server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+            #         server.login(sender, password)
+            #         server.sendmail(sender, reciever, message)
+            #         print("ok")
+            #         messagebox.showinfo("Library System", "Send mail Successfully !")
+            #     except Exception as e:
+            #         pass
 
         obissue = test()
         obissue.issue()
@@ -1106,7 +1106,7 @@ class main:
                 )
                 self.backbt.place(x=0, y=0)
                 self.log = PhotoImage(
-                    file="D:\\Documents\\vscode\\python\\avijeets mini project\\library-management-files\\backbtn1.png"
+                    file=r"library_management_files\visual_assets\backbtn1.png"
                 )
                 self.backbt.config(image=self.log, compound=LEFT)
                 self.small_log = self.log.subsample(2, 2)
@@ -1114,11 +1114,11 @@ class main:
 
             def searchedit(self):
                 self.datas = self.entry.get()
-                cursor = dbstore.cursor()
+                cursor = db_books.cursor()
                 cursor.execute(
                     "SELECT * FROM Books WHERE BookID = '" + self.datas + "'"
                 )
-                dbstore.commit()
+                db_books.commit()
                 self.val = cursor.fetchone()
                 if self.val != None:
                     self.edcat = Tk()
@@ -1126,7 +1126,7 @@ class main:
                     self.edcat.geometry("300x360+600+230")
                     self.edcat.configure(bg="#ffe8ec")
                     self.edcat.iconbitmap(
-                        "library_management_files\visual_assets\backbtn1.png"
+                        r"library_management_files\visual_assets\backbtn1.png"
                     )
 
                     self.fc = Frame(self.edcat, bg="#1c1c1b", width=90, height=30)
@@ -1256,7 +1256,7 @@ class main:
                 self.pi = self.en5.get()
 
                 if self.id and self.ti and self.au and self.ed and self.pi:
-                    cursor = dbstore.cursor()
+                    cursor = db_books.cursor()
                     cursor.execute(
                         "UPDATE Books SET BookID='"
                         + self.id
@@ -1272,7 +1272,7 @@ class main:
                         + self.datas
                         + "'"
                     )
-                    dbstore.commit()
+                    db_books.commit()
                     messagebox.showinfo(
                         "Changes Saved", "Data has been updated successfully!"
                     )
@@ -1358,7 +1358,7 @@ class main:
 
             def retsucc(self):
                 self.entry4.delete(0, END)
-                cursor1 = dbstudents.cursor()
+                cursor1 = db_students.cursor()
                 cursor1.execute(
                     "UPDATE Students SET FromDate='',ToDate='',Charge='"
                     + str(self.charge)
@@ -1366,7 +1366,7 @@ class main:
                     + self.entry
                     + "'"
                 )
-                dbstudents.commit()
+                db_students.commit()
                 messagebox.showinfo(
                     "Success", "Charges Updated and Books Returned Succesfully"
                 )
@@ -1375,14 +1375,14 @@ class main:
             def retbook(self):
                 self.charge = 0
                 self.entry = self.entry4.get()
-                cursor = dbstudents.cursor()
+                cursor = db_students.cursor()
                 cursor.execute("SELECT * FROM Students WHERE REG='" + self.entry + "'")
-                dbstudents.commit()
+                db_students.commit()
                 self.data = cursor.fetchone()
                 if self.data != None:
                     if int(self.data[11]) >= 1:
                         self.get_date = date.today()
-                        cursor = dbstudents.cursor()
+                        cursor = db_students.cursor()
                         cursor.execute(
                             "UPDATE Students SET NoBook = 0, SubmitDate='"
                             + str(self.get_date)
@@ -1390,23 +1390,23 @@ class main:
                             + self.entry
                             + "'"
                         )
-                        dbstudents.commit()
+                        db_students.commit()
 
-                        cursor = dbstore.cursor()
+                        cursor = db_books.cursor()
                         cursor.execute(
                             "UPDATE Books SET Issue='', ID='' WHERE ID='"
                             + self.entry
                             + "'"
                         )
-                        dbstore.commit()
+                        db_books.commit()
 
                         from datetime import datetime
 
-                        cursor = dbstudents.cursor()
+                        cursor = db_students.cursor()
                         cursor.execute(
                             "SELECT * FROM Students WHERE REG='" + self.entry + "'"
                         )
-                        dbstudents.commit()
+                        db_students.commit()
                         self.var = cursor.fetchone()
 
                         if self.var != None:
@@ -1428,7 +1428,7 @@ class main:
                                 self.tom = Tk()
                                 self.tom.geometry("300x150+300+258")
                                 self.tom.iconbitmap(
-                                    "library_management_files\visual_assets\backbtn1.png"
+                                    r"library_management_files\visual_assets\backbtn1.png"
                                 )
                                 self.tom.title("Library System")
                                 self.tom.resizable(0, 0)
@@ -1495,7 +1495,7 @@ class main:
 
                                 self.tom.mainloop()
 
-                            cursor1 = dbstudents.cursor()
+                            cursor1 = db_students.cursor()
                             cursor1.execute(
                                 "UPDATE Students SET FromDate='',ToDate='',Charge='"
                                 + str(self.charge)
@@ -1503,7 +1503,7 @@ class main:
                                 + self.entry
                                 + "'"
                             )
-                            dbstudents.commit()
+                            db_students.commit()
 
                     else:
                         messagebox.showwarning(
@@ -1591,15 +1591,15 @@ class main:
 
             def deldata(self):
                 self.a = self.entry4.get()
-                cursor = dbstore.cursor()
-                cursorv = dbstore.cursor()
+                cursor = db_books.cursor()
+                cursorv = db_books.cursor()
                 cursorv.execute("SELECT * FROM BOOKS WHERE BookID='" + self.a + "'")
-                dbstore.commit()
+                db_books.commit()
                 self.validation = cursorv.fetchone()
 
                 if self.validation != None:
                     cursor.execute("DELETE FROM Books WHERE BookID='" + self.a + "'")
-                    dbstore.commit()
+                    db_books.commit()
                     messagebox.showinfo(
                         "Succesful", "The book is successfully removed from the store!"
                     )
@@ -1684,15 +1684,15 @@ class main:
 
             def srch(self):
                 self.emp = self.entryl.get()
-                cursor = dbstore.cursor()
+                cursor = db_books.cursor()
                 cursor.execute("SELECT * FROM Books WHERE BookID='" + self.emp + "'")
-                dbstore.commit()
+                db_books.commit()
                 self.srval = cursor.fetchone()
                 if self.srval != None:
                     self.top = Tk()
                     self.top.title("Library System")
                     self.top.iconbitmap(
-                        "library_management_files\visual_assets\backbtn1.png"
+                        r"library_management_files\visual_assets\backbtn1.png"
                     )
                     self.top.geometry("400x200+335+250")
                     self.top.resizable(0, 0)
@@ -1834,13 +1834,13 @@ class main:
                 self.fetch_data()
 
             def fetch_data(self):
-                cursor = dbstore.cursor()
+                cursor = db_books.cursor()
                 cursor.execute("SELECT * FROM Books")
                 self.rows = cursor.fetchall()
                 if len(self.rows) != 0:
                     for self.row in self.rows:
                         self.book_table.insert("", END, values=self.row)
-                dbstore.commit()
+                db_books.commit()
 
         oc = test()
 
@@ -1952,7 +1952,7 @@ class main:
         self.rog = Tk()
         self.rog.title("Change password")
         self.rog.geometry("400x300+300+210")
-        self.rog.iconbitmap("library_management_files\visual_assets\aa.ico")
+        self.rog.iconbitmap(r"library_management_files\visual_assets\aa.ico")
         self.rog.resizable(0, 0)
         self.rog.configure(bg="#000")
 
